@@ -3,19 +3,12 @@ package herramienta;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
-import javax.swing.JToolBar;
-
-import java.awt.BorderLayout;
-
 import javax.swing.DefaultListModel;
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
-import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.LineBorder;
 
 import java.awt.Color;
@@ -31,7 +24,6 @@ import javax.swing.UIManager;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.JList;
 
 import java.awt.event.ActionListener;
@@ -43,8 +35,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.JFileChooser;
 import javax.swing.event.ListSelectionListener;
@@ -52,6 +42,8 @@ import javax.swing.event.ListSelectionEvent;
 
 public class HerramientaTesting {
 
+	// Componentes visuales
+	
 	private JFrame frmHerramientaTesting;
 	
 	private JTextField lineasCodTot;
@@ -63,17 +55,26 @@ public class HerramientaTesting {
 	private JTextField HLongitud;
 	private JTextField HVolumen;
 	
-	private JMenuItem mntmElegirCarpeta;
+	private JMenuItem mntmNewMenuItem;
 	
+	@SuppressWarnings("rawtypes")
 	private JList ArchivoList;
+	@SuppressWarnings("rawtypes")
+	private JList ClaseList;
+	@SuppressWarnings("rawtypes")
+	private JList MetodoList;
+	
+	@SuppressWarnings("rawtypes")
 	private DefaultListModel  listModel;
+	@SuppressWarnings("rawtypes")
 	private DefaultListModel claseModel;
+	@SuppressWarnings("rawtypes")
 	private DefaultListModel metodoModel;
-	private JList ClaseList ;
-	private JList MetodoList ;
+	
 	private JTextArea CodigoText;
 	
-	//Analizar codigo
+	// Analizar codigo
+	
 	private int cantLineas=0;
 	private int cantComent=0;
 	private int cantComentCod=0;
@@ -86,7 +87,6 @@ public class HerramientaTesting {
     private File archivo;
     String nombreArchivo;
     private String nombreClase;
-    private Halstead hal;
 	
     //Halstead
     private File archivoOperandos=null;
@@ -121,6 +121,7 @@ public class HerramientaTesting {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		
 		frmHerramientaTesting = new JFrame();
 		frmHerramientaTesting.setResizable(false);
 		frmHerramientaTesting.setTitle("Herramienta Testing");
@@ -132,196 +133,42 @@ public class HerramientaTesting {
 		menuBar.setBounds(0, 0, 881, 21);
 		frmHerramientaTesting.getContentPane().add(menuBar);
 		
-		JMenu mnMenuBar = new JMenu("An\u00E1lisis");
-		menuBar.add(mnMenuBar);
+		JMenu mnNewMenu = new JMenu("An\u00E1lisis");
+		menuBar.add(mnNewMenu);
 		
-		mntmElegirCarpeta = new JMenuItem("Elegir carpeta ... ");
-		
-		mntmElegirCarpeta.addActionListener(new ActionListener() {
+		mntmNewMenuItem = new JMenuItem("Elegir carpeta ... ");
+		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				ArchivoList.clearSelection();
-				JFileChooser  chooser = new JFileChooser ();
-				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //PERMITE SELECCIONAR SOLO DIRECTORIOS
-				
-				// NAHU: Con esto permite elegir archivos, pero al elegir un .java no muestra nada por pantalla
-//				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				
-				//chooser.setCurrentDirectory(File.listRoots()[0]);
-				int i=0,cont=0;
-				
-				FileFilter filtro=new FileFilter() {
-					@Override
-					public boolean accept(File pathname) {
-						String arch=pathname.toString();
-						if(arch.endsWith(".java"))
-							return true;
-						else
-							return false;
-						// TODO Auto-generated method stub
-					}
-				};
-				
-				if ((chooser.showOpenDialog(mntmElegirCarpeta))!=JFileChooser .APPROVE_OPTION) 
-					return; // Si no elige un archivo termina el método.
-				
-				File seleccion=chooser.getSelectedFile();
-				File [] ficheros = seleccion.listFiles();
-				claseModel.removeAllElements();
-				listModel.removeAllElements();
-				while(ficheros.length > i)
-				{
-					if(filtro.accept(ficheros[i]))
-					{
-						listModel.addElement(ficheros[i]);
-						cont++;
-					}
-						
-					i++;
-				}
-
-				if(cont == 0)	
-				{
-					listModel.addElement("Esta carpeta no contiene archivos .java");
-				}
-
+				elegirCarpeta();
 			}
 		});
+		mnNewMenu.add(mntmNewMenuItem);
 		
-		mnMenuBar.add(mntmElegirCarpeta);
-		
-		JMenuItem mntmSalir = new JMenuItem("Salir");
-		mntmSalir.addActionListener(new ActionListener() {
+		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Salir");
+		mntmNewMenuItem_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(1);
 			}
 		});
-		mnMenuBar.add(mntmSalir);
+		mnNewMenu.add(mntmNewMenuItem_1);
 		
 		JLabel lblSeleccioneUnArchivo = new JLabel("Seleccione un archivo de la lista:");
 		lblSeleccioneUnArchivo.setForeground(new Color(0, 100, 0));
 		lblSeleccioneUnArchivo.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblSeleccioneUnArchivo.setBounds(10, 32, 382, 21);
 		frmHerramientaTesting.getContentPane().add(lblSeleccioneUnArchivo);
-		JScrollPane scrollPaneSeleccioneUnArchivo = new JScrollPane();
-		scrollPaneSeleccioneUnArchivo.setBounds(10, 64, 540, 136);
-		frmHerramientaTesting.getContentPane().add(scrollPaneSeleccioneUnArchivo);
-		ArchivoList = new JList(listModel);
-		scrollPaneSeleccioneUnArchivo.setViewportView(ArchivoList);
 		
-		ArchivoList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent arg0) { //CON ESTA ACCION SE VA A SELECCIONAR UN ARCHIVO DE LA LISTA
-			
-				try
-				{
-					nombreArchivo=ArchivoList.getSelectedValue().toString();
-					if(!nombreArchivo.equals("Esta carpeta no contiene archivos .java"))
-					{				
-						String cad=nombreArchivo.substring(nombreArchivo.lastIndexOf("\\")+1, nombreArchivo.length()-5);
-						claseModel.removeAllElements();
-						metodoModel.removeAllElements();
-						//claseModel.addElement(cad);
-						analizarCodigo();		//Realiza el analisis completo del código
-					}
-				}catch(Exception e)
-				{
-					
-				}
-			}
-		});
-		
-		ArchivoList.setBorder(new LineBorder(new Color(0, 0, 0)));
-		ArchivoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
-		JLabel lblSeleccioneUnaClase = new JLabel("Seleccione una clase de la lista:");
-		lblSeleccioneUnaClase.setForeground(new Color(0, 100, 0));
-		lblSeleccioneUnaClase.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblSeleccioneUnaClase.setBounds(10, 211, 210, 21);
-		frmHerramientaTesting.getContentPane().add(lblSeleccioneUnaClase);
-		JScrollPane scrollPaneSeleccioneUnaClase = new JScrollPane();
-		scrollPaneSeleccioneUnaClase.setBounds(10, 243, 258, 152);
-		frmHerramientaTesting.getContentPane().add(scrollPaneSeleccioneUnaClase);
-		ClaseList = new JList(claseModel);
-		ClaseList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent arg0) {//con esta funcion se selecciona una clase de la lista
-				FileReader fr = null;
-				BufferedReader br = null;
-				String linea = new String();
-				metodoModel.removeAllElements();
-				
-				try {
-					fr = new FileReader(nombreArchivo);
-				} catch (FileNotFoundException e5) {
-					e5.printStackTrace();
-				}
-				 br = new BufferedReader(fr);
-				 
-				try
-				{
-					
-					linea=br.readLine();
-					while(linea!=null)
-					{	
-						obtenerFunciones(linea);
-						linea=br.readLine();
-					}
-					
-				}
-				catch(IOException e1)
-				{
-					e1.printStackTrace();
-				}
-				finally{
-					try{
-						if(null != fr)
-							fr.close();
-					}
-					catch(Exception e2)
-					{
-						e2.printStackTrace();
-					}
-				}
-				
-			}
-		});
-		scrollPaneSeleccioneUnaClase.setViewportView(ClaseList);
-		ClaseList.setBorder(new LineBorder(new Color(0, 0, 0)));
-		ClaseList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		JLabel lblNewLabel = new JLabel("Seleccione una clase de la lista:");
+		lblNewLabel.setForeground(new Color(0, 100, 0));
+		lblNewLabel.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblNewLabel.setBounds(10, 211, 210, 21);
+		frmHerramientaTesting.getContentPane().add(lblNewLabel);
 		
 		JLabel lblSeleccioneUnMetodo = new JLabel("Seleccione un metodo de la lista:");
 		lblSeleccioneUnMetodo.setForeground(new Color(0, 100, 0));
 		lblSeleccioneUnMetodo.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblSeleccioneUnMetodo.setBounds(292, 211, 210, 21);
 		frmHerramientaTesting.getContentPane().add(lblSeleccioneUnMetodo);
-		
-		
-		JScrollPane scrollPaneSeleccioneUnMetodo = new JScrollPane();
-		scrollPaneSeleccioneUnMetodo.setBounds(292, 243, 258, 152);
-		frmHerramientaTesting.getContentPane().add(scrollPaneSeleccioneUnMetodo);
-		MetodoList = new JList(metodoModel);
-		MetodoList.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {//con esta acción se selecciona un método de la lista
-				  analizarFuncion(MetodoList.getSelectedValue().toString());
-				
-			}
-		});
-		scrollPaneSeleccioneUnMetodo.setViewportView(MetodoList);
-		MetodoList.setBorder(new LineBorder(new Color(0, 0, 0)));
-		MetodoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		
-		JLabel lblCodigoDelMetodo = new JLabel("Codigo del metodo seleccionado:");
-		lblCodigoDelMetodo.setForeground(new Color(0, 100, 0));
-		lblCodigoDelMetodo.setFont(new Font("Tahoma", Font.BOLD, 12));
-		lblCodigoDelMetodo.setBounds(10, 410, 451, 21);
-		frmHerramientaTesting.getContentPane().add(lblCodigoDelMetodo);
-		
-		JScrollPane scrollPaneCodigoDelMetodo = new JScrollPane();
-		scrollPaneCodigoDelMetodo.setBounds(10, 435, 760, 244);
-		frmHerramientaTesting.getContentPane().add(scrollPaneCodigoDelMetodo);
-		
-		CodigoText = new JTextArea();
-		CodigoText.setBorder(new LineBorder(new Color(0, 0, 0)));
-		CodigoText.setEditable(false);
-		scrollPaneCodigoDelMetodo.setViewportView(CodigoText);
 		
 		JLayeredPane layeredPane = new JLayeredPane();
 		layeredPane.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Analisis del metodo", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 100, 0)));
@@ -344,11 +191,6 @@ public class HerramientaTesting {
 		layeredPane.add(lineasCodTot);
 		lineasCodTot.setColumns(10);
 		
-		JLabel lblLineasDeCodigoComentadas = new JLabel("Lineas de codigo comentadas");
-		lblLineasDeCodigoComentadas.setHorizontalAlignment(SwingConstants.CENTER);
-		lblLineasDeCodigoComentadas.setBounds(10, 69, 190, 14);
-		layeredPane.add(lblLineasDeCodigoComentadas);
-		
 		lineasCodComent = new JTextField();
 		lineasCodComent.setHorizontalAlignment(SwingConstants.CENTER);
 		lineasCodComent.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -360,16 +202,10 @@ public class HerramientaTesting {
 		lineasCodComent.setBounds(66, 83, 86, 20);
 		layeredPane.add(lineasCodComent);
 		
-		JLabel lblPorcentajeDeLineas = new JLabel("Porcentaje de lineas de codigo ");
-		lblPorcentajeDeLineas.setToolTipText("");
-		lblPorcentajeDeLineas.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPorcentajeDeLineas.setBounds(10, 116, 190, 14);
-		layeredPane.add(lblPorcentajeDeLineas);
-		
-		JLabel lblComentadas = new JLabel("comentadas");
-		lblComentadas.setHorizontalAlignment(SwingConstants.CENTER);
-		lblComentadas.setBounds(10, 128, 190, 14);
-		layeredPane.add(lblComentadas);
+		JLabel lblLineasDeCodigo_1 = new JLabel("Lineas de codigo comentadas");
+		lblLineasDeCodigo_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLineasDeCodigo_1.setBounds(10, 69, 190, 14);
+		layeredPane.add(lblLineasDeCodigo_1);
 		
 		porcentLineas = new JTextField();
 		porcentLineas.setHorizontalAlignment(SwingConstants.CENTER);
@@ -382,10 +218,11 @@ public class HerramientaTesting {
 		porcentLineas.setBounds(66, 141, 86, 20);
 		layeredPane.add(porcentLineas);
 		
-		JLabel lblComplejidadCiclomtica = new JLabel("Complejidad Ciclom\u00E1tica");
-		lblComplejidadCiclomtica.setHorizontalAlignment(SwingConstants.CENTER);
-		lblComplejidadCiclomtica.setBounds(10, 172, 190, 14);
-		layeredPane.add(lblComplejidadCiclomtica);
+		JLabel lblPorcentajeDeLineas = new JLabel("Porcentaje de lineas de codigo ");
+		lblPorcentajeDeLineas.setToolTipText("");
+		lblPorcentajeDeLineas.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPorcentajeDeLineas.setBounds(10, 116, 190, 14);
+		layeredPane.add(lblPorcentajeDeLineas);
 		
 		complejidadC = new JTextField();
 		complejidadC.setHorizontalAlignment(SwingConstants.CENTER);
@@ -398,10 +235,10 @@ public class HerramientaTesting {
 		complejidadC.setBounds(66, 186, 86, 20);
 		layeredPane.add(complejidadC);
 		
-		JLabel lblFanIn = new JLabel("Fan In");
-		lblFanIn.setHorizontalAlignment(SwingConstants.CENTER);
-		lblFanIn.setBounds(10, 217, 190, 14);
-		layeredPane.add(lblFanIn);
+		JLabel lblComplejidadCiclomtica = new JLabel("Complejidad Ciclom\u00E1tica");
+		lblComplejidadCiclomtica.setHorizontalAlignment(SwingConstants.CENTER);
+		lblComplejidadCiclomtica.setBounds(10, 172, 190, 14);
+		layeredPane.add(lblComplejidadCiclomtica);
 		
 		fanIn = new JTextField();
 		fanIn.setHorizontalAlignment(SwingConstants.CENTER);
@@ -413,11 +250,13 @@ public class HerramientaTesting {
 		fanIn.setColumns(10);
 		fanIn.setBounds(66, 231, 86, 20);
 		layeredPane.add(fanIn);
+		fanIn.setVisible(false);
 		
-		JLabel lblFanOut = new JLabel("Fan Out");
-		lblFanOut.setHorizontalAlignment(SwingConstants.CENTER);
-		lblFanOut.setBounds(10, 263, 190, 14);
-		layeredPane.add(lblFanOut);
+		JLabel lblFanIn = new JLabel("Fan In");
+		lblFanIn.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFanIn.setBounds(10, 217, 190, 14);
+		layeredPane.add(lblFanIn);
+		lblFanIn.setVisible(false);
 		
 		fanOut = new JTextField();
 		fanOut.setHorizontalAlignment(SwingConstants.CENTER);
@@ -429,11 +268,13 @@ public class HerramientaTesting {
 		fanOut.setColumns(10);
 		fanOut.setBounds(66, 277, 86, 20);
 		layeredPane.add(fanOut);
+		fanOut.setVisible(false);
 		
-		JLabel lblHalsteadLongitud = new JLabel("Halstead longitud");
-		lblHalsteadLongitud.setHorizontalAlignment(SwingConstants.CENTER);
-		lblHalsteadLongitud.setBounds(10, 310, 190, 14);
-		layeredPane.add(lblHalsteadLongitud);
+		JLabel lblFanOut = new JLabel("Fan Out");
+		lblFanOut.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFanOut.setBounds(10, 263, 190, 14);
+		layeredPane.add(lblFanOut);
+		lblFanOut.setVisible(false);
 		
 		HLongitud = new JTextField();
 		HLongitud.setHorizontalAlignment(SwingConstants.CENTER);
@@ -445,11 +286,13 @@ public class HerramientaTesting {
 		HLongitud.setColumns(10);
 		HLongitud.setBounds(66, 324, 86, 20);
 		layeredPane.add(HLongitud);
+		HLongitud.setVisible(false);
 		
-		JLabel lblHalsteadVolumen = new JLabel("Halstead volumen");
-		lblHalsteadVolumen.setBounds(10, 356, 190, 14);
-		layeredPane.add(lblHalsteadVolumen);
-		lblHalsteadVolumen.setHorizontalAlignment(SwingConstants.CENTER);
+		JLabel lblHalsteadLongitud = new JLabel("Halstead longitud");
+		lblHalsteadLongitud.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHalsteadLongitud.setBounds(10, 310, 190, 14);
+		layeredPane.add(lblHalsteadLongitud);
+		lblHalsteadLongitud.setVisible(false);
 		
 		HVolumen = new JTextField();
 		HVolumen.setHorizontalAlignment(SwingConstants.CENTER);
@@ -461,16 +304,87 @@ public class HerramientaTesting {
 		HVolumen.setBounds(66, 370, 86, 20);
 		layeredPane.add(HVolumen);
 		HVolumen.setColumns(10);
+		HVolumen.setVisible(false);
+		
+		JLabel lblHalsteadVolumen = new JLabel("Halstead volumen");
+		lblHalsteadVolumen.setBounds(10, 356, 190, 14);
+		layeredPane.add(lblHalsteadVolumen);
+		lblHalsteadVolumen.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHalsteadVolumen.setVisible(false);
+		
+		JLabel lblComentadas = new JLabel("comentadas");
+		lblComentadas.setHorizontalAlignment(SwingConstants.CENTER);
+		lblComentadas.setBounds(10, 128, 190, 14);
+		layeredPane.add(lblComentadas);
+		
+		JLabel lblCodigoDelMetodo = new JLabel("Codigo del metodo seleccionado:");
+		lblCodigoDelMetodo.setForeground(new Color(0, 100, 0));
+		lblCodigoDelMetodo.setFont(new Font("Tahoma", Font.BOLD, 12));
+		lblCodigoDelMetodo.setBounds(10, 410, 451, 21);
+		frmHerramientaTesting.getContentPane().add(lblCodigoDelMetodo);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(10, 435, 760, 244);
+		frmHerramientaTesting.getContentPane().add(scrollPane);
+		
+		CodigoText = new JTextArea();
+		CodigoText.setBorder(new LineBorder(new Color(0, 0, 0)));
+		CodigoText.setEditable(false);
+		scrollPane.setViewportView(CodigoText);
 		
 		listModel = new DefaultListModel();
+		JScrollPane scrollPane_1 = new JScrollPane();
+		scrollPane_1.setBounds(10, 64, 540, 136);
+		frmHerramientaTesting.getContentPane().add(scrollPane_1);
+		ArchivoList = new JList(listModel);
+		scrollPane_1.setViewportView(ArchivoList);
 		
+		ArchivoList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				// Con esta funcion se selecciona un archivo de la lista
+				seleccionarArchivo();
+			}
+		});
 		
-		claseModel=new DefaultListModel();
+		ArchivoList.setBorder(new LineBorder(new Color(0, 0, 0)));
+		ArchivoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		claseModel = new DefaultListModel();
+		JScrollPane scrollPane_2 = new JScrollPane();
+		scrollPane_2.setBounds(10, 243, 258, 152);
+		frmHerramientaTesting.getContentPane().add(scrollPane_2);
+		
+		ClaseList = new JList(claseModel);
+		
+		ClaseList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				// Con esta funcion se selecciona una clase de la lista
+				seleccionarClase();
+			}
+		});
+		scrollPane_2.setViewportView(ClaseList);
+		ClaseList.setBorder(new LineBorder(new Color(0, 0, 0)));
+		ClaseList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		scrollPane_3.setBounds(292, 243, 258, 152);
+		frmHerramientaTesting.getContentPane().add(scrollPane_3);
 		
 		metodoModel = new DefaultListModel();
+		MetodoList = new JList(metodoModel);
+		MetodoList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				// Con esta acción se selecciona un método de la lista
+				analizarFuncion(MetodoList.getSelectedValue().toString());
+			}
+		});
+		scrollPane_3.setViewportView(MetodoList);
+		MetodoList.setBorder(new LineBorder(new Color(0, 0, 0)));
+		MetodoList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
 	
-	public void analizarCodigo() {//esta función analiza tódo el código del programa
+	// Esta función analiza tódo el código del programa
+	public void analizarCodigo() {
 		
 		FileReader fr = null;
 		BufferedReader br = null;
@@ -559,7 +473,6 @@ public class HerramientaTesting {
 			 complejidadC.setText(Integer.toString(numeroCiclomatico));
 			 porcentLineas.setText(Integer.toString((cantComent*100)/cantLineas)+"%");
 			 //numeroCiclomatico=0;
-			 Halstead();
 			        
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -569,13 +482,12 @@ public class HerramientaTesting {
 	                		fr.close();
 				} catch (IOException e) {
 					e.printStackTrace();
-				}
-	                }
-			 
-			
-		}
+				}            
+		}	
+	}
 	
-	public void obtenerFunciones(String linea){ //esta función encuentra los métodos de la clase
+	// Esta función encuentra los métodos de la clase
+	public void obtenerFunciones(String linea){
 		String campos[],campos2[],campos3[];
 		try{
 		if ( (linea.contains("private") || linea.contains("public") || linea.contains("protected") ) && linea.contains("{") && !linea.contains("class") && !linea.contains("run") && !linea.contains("actionPerformed") ){
@@ -606,7 +518,8 @@ public class HerramientaTesting {
 		}
 	}
 	
-	public void obtenerClases(String linea){ //encuentra las clases en el código		
+	// Encuentra las clases en el código
+	public void obtenerClases(String linea){
 		String campos[];
 		try{
 		if (linea.contains("class")){
@@ -624,8 +537,9 @@ public class HerramientaTesting {
 			e.printStackTrace();
 		}
 	}
-
-	public void analizarFuncion(String item){ //será llamada al seleccionar un método y hará todo el análisis sólo del método seleccionado mostrandolo por pantalla
+	
+	// Será llamada al seleccionar un método y hará todo el análisis sólo del método seleccionado mostrandolo por pantalla
+	public void analizarFuncion(String item){
         int fanin=0;
         int fanout=0;
         int contLlave=1;
@@ -645,7 +559,8 @@ public class HerramientaTesting {
 	    cantVar=0;
 		numeroCiclomatico=0;
 		CodigoText.setText(null);
-       try{
+       
+		try {
     	   		archivoOperandos = new File("operandos.txt");
 	            fr = null;
 	            br = null;
@@ -818,7 +733,6 @@ public class HerramientaTesting {
 			 
 			 fanIn.setText(Integer.toString(fanin));
 			 fanOut.setText(Integer.toString(fanout));
-                 
                 
 	}catch (IOException e1) {
 		e1.printStackTrace();
@@ -833,84 +747,112 @@ public class HerramientaTesting {
 		}
 	}
 	
-	public void Halstead() throws IOException{	// realiza el analisis de Halstead en todo el archivo con los operandos del archivo "Operandos.txt"
-        try {
-            archivoOperandos = new File("operandos.txt");
-            FileReader fr = null;
-            BufferedReader br = null;
-            listaOp = new ArrayList<Operador>();
-           
-            fr = new FileReader(archivoOperandos);
-            br = new BufferedReader(fr);
-            String linea = new String();
-            Operador aux;
-            linea=br.readLine();
-            while(linea != null){
-                aux = new Operador(linea);
-                listaOp.add(aux);
-                linea = br.readLine();
-            }
-            fr.close();
-            br.close();        
-            ////////////////////////////////////
-            fr = null;
-            br = null;
-                       
-            fr = new FileReader(nombreArchivo);
-            br = new BufferedReader(fr);
-            
-            linea=br.readLine();
-            String campos[];
-            while(linea != null){
-                for (Operador operador : listaOp) {
-                   if(operador.getNombre().equals("+") || operador.getNombre().equals("|") || 
-                           operador.getNombre().equals("*") || operador.getNombre().equals("+=")
-                           || operador.getNombre().equals("*=")){
-                               
-                                campos=linea.split("\\"+operador.getNombre());
-                   
-                   }
-                   else{
-                       if(operador.getNombre().equals("++"))
-                           campos=linea.split("\\+\\+");
-                       else {
-                           if(operador.getNombre().equals("||")) {
-                              campos=linea.split("\\|\\|"); 
-                               
-                               }
-                           else
-                                campos=linea.split(operador.getNombre());     
-                       }
-              }
-                   operador.contar(campos.length-1);
-                      
-            }
-             linea = br.readLine();        
-            
-      }
-         for (Operador operator : listaOp) {
-             
-	         if(operator.getContador()!=0){
-	             
-	             n1++;
-	             N1+=operator.getContador();
-	         }
-             
-         
-         }
-         N2=20;
-         n2=12;        
-         N = N1+N2;
-         HLongitud.setText(Integer.toString(N));
-         n = n1+n2;
-         volumen = N*(Math.log(n)/Math.log(2));
-         HVolumen.setText(Integer.toString(n));
-         
-         N=N2=N1=n=n1=n2=0;
-       
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(Halstead.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+	// Selecciona la carpeta con los archivos a analizar
+	protected void elegirCarpeta() {
+		
+		ArchivoList.clearSelection();
+		JFileChooser  chooser = new JFileChooser ();
+		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY); //PERMITE SELECCIONAR SOLO DIRECTORIOS
+		
+		// NAHU: Con esto permite elegir archivos, pero al elegir un .java no muestra nada por pantalla
+//		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		
+		//chooser.setCurrentDirectory(File.listRoots()[0]);
+		int i=0,cont=0;
+		
+		FileFilter filtro=new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				String arch=pathname.toString();
+				if(arch.endsWith(".java"))
+					return true;
+				else
+					return false;
+				// TODO Auto-generated method stub
+			}
+		};
+		
+		if ((chooser.showOpenDialog(mntmNewMenuItem))!=JFileChooser .APPROVE_OPTION) 
+			return; // Si no elige un archivo termina el método.
+		
+		File seleccion=chooser.getSelectedFile();
+		File [] ficheros = seleccion.listFiles();
+		claseModel.removeAllElements();
+		listModel.removeAllElements();
+		while(ficheros.length > i)
+		{
+			if(filtro.accept(ficheros[i]))
+			{
+				listModel.addElement(ficheros[i]);
+				cont++;
+			}
+				
+			i++;
+		}
+
+		if(cont == 0)	
+		{
+			listModel.addElement("Esta carpeta no contiene archivos .java");
+		}
+	}
 	
+	// Selecciona el archivo a analizar
+	protected void seleccionarArchivo() {
+		try {
+			nombreArchivo=ArchivoList.getSelectedValue().toString();
+			if(!nombreArchivo.equals("Esta carpeta no contiene archivos .java"))
+			{				
+//				String cad = nombreArchivo.substring(nombreArchivo.lastIndexOf("\\")+1, nombreArchivo.length()-5);
+				claseModel.removeAllElements();
+				metodoModel.removeAllElements();
+				//claseModel.addElement(cad);
+				//Realiza el analisis completo del código
+				analizarCodigo();		
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// Selecciona una clase dentro del listado de clases del archivo
+	protected void seleccionarClase() {
+		
+		FileReader fr = null;
+		BufferedReader br = null;
+		String linea = new String();
+		
+		metodoModel.removeAllElements();
+		
+		try {
+			fr = new FileReader(nombreArchivo);
+		} catch (FileNotFoundException e5) {
+			e5.printStackTrace();
+		}
+		 
+		br = new BufferedReader(fr);
+		 
+		try
+		{	
+			linea=br.readLine();
+			while(linea!=null)
+			{	
+				obtenerFunciones(linea);
+				linea=br.readLine();
+			}
+		}
+		catch(IOException e1)
+		{
+			e1.printStackTrace();
+		}
+		finally {
+			try {
+				if(null != fr)
+					fr.close();
+			}
+			catch(Exception e2)
+			{
+				e2.printStackTrace();
+			}
+		}
+	}
 }
